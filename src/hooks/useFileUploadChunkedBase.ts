@@ -48,6 +48,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     const session = sessionsRef.current[id];
     if (!session) return;
 
+    // Update the progress percentage based on the number of uploaded chunks and total chunks
     const percent =
       session.totalChunks > 0
         ? Math.round((session.uploadedCount / session.totalChunks) * 100)
@@ -57,6 +58,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
 
     if (!session.fileHash || !session.uploadId) return;
 
+    // Store the resumable upload state in localStorage for resuming later
     putResumableUpload({
       fileHash: session.fileHash,
       fileName: session.file.name,
@@ -144,6 +146,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     id: string,
     session: UploadSession,
   ) => {
+    // Generate chunks for the file
     const chunks = generateFileChunks(session.file);
 
     if (!session.fileHash) {
@@ -155,6 +158,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
       appendLog(id, "[hash] done");
     }
 
+    // Call the server to initialize the upload and check if it's already completed
     const response = await api.post("/uploads/init", {
       fileHash: session.fileHash,
       fileName: session.file.name,
@@ -174,6 +178,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
       mapServerStatusToClientStatus(initStatus) ===
       FileUploadingStatusEnum.COMPLETED;
 
+    // If the server indicates that the file is already completed, we can skip the upload process
     if (alreadyCompleted) {
       appendLog(id, "[upload] file already uploaded, deduplicated");
       session.uploadedCount = chunks.length;
@@ -185,6 +190,9 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
       return { alreadyCompleted: true };
     }
 
+    // If the server indicates that the file is not completed,
+    // we need to determine which chunks have already been uploaded and which ones still need to be uploaded.
+    // We can do this by comparing the list of uploaded chunk indexes returned by the server with the list of all chunk indexes.
     const alreadyUploadedIndexes = new Set(uploadedChunks);
     session.remainingChunks = chunks.filter(
       (chunk) => !alreadyUploadedIndexes.has(chunk.index),
@@ -210,12 +218,14 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     session.isPaused = false;
 
     try {
+      // Initialize the upload on the server and check if it's already completed
       const { alreadyCompleted } = await handleInitializeUploadOnServer(
         id,
         session,
       );
       if (alreadyCompleted) return;
 
+      // If the upload is not already completed, proceed to upload the remaining chunks
       await handleUploadRemainingChunks(id);
     } catch (err) {
       appendLog(id, "[upload] init failed");
@@ -235,16 +245,19 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   };
 
   const handleResumeDetected = (id: string) => {
+    // If a resumable upload is detected, we can resume the upload by calling handleUpload with the existing session.
     appendLog(id, "[resume] resuming previous upload");
     handleStartUpload(id);
   };
 
   const handleStartFresh = async (id: string) => {
+    // If the user chooses to start a fresh upload, we need to abort any existing resumable upload on the server and clear the localStorage record.
     const session = sessionsRef.current[id];
     const record = getResumableUpload(session?.fileHash);
 
     if (record) {
       try {
+        // Call the server to abort the previous upload
         await api.delete(`/uploads/${record.uploadId}`);
         appendLog(id, "[resume] aborted previous upload on the server");
       } catch {
@@ -253,6 +266,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
           "[resume] could not abort previous upload on the server, continuing anyway",
         );
       }
+      // Clear the localStorage record for the resumable upload
       clearResumableUpload(record.fileHash);
     }
 
@@ -260,12 +274,15 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   };
 
   const handlePause = (id: string) => {
+    // If the user chooses to pause the upload, we set the isPaused flag in the session to true.
     const session = sessionsRef.current[id];
     if (session) session.isPaused = true;
     appendLog(id, "[upload] pause requested");
   };
 
   const handleResume = async (id: string) => {
+    // If the user chooses to resume the upload,
+    // we set the isPaused flag in the session to false and call handleUploadRemainingChunks to continue uploading the remaining chunks.
     const session = sessionsRef.current[id];
     if (!session || !session.uploadId) return;
 
@@ -277,6 +294,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   };
 
   const handleCancel = (id: string) => {
+    // If the user chooses to cancel the upload, we abort the current upload request and reset the session state.
     const session = sessionsRef.current[id];
     session?.controller?.abort();
 
@@ -297,6 +315,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   };
 
   const handleRemoveFile = (id: string) => {
+    // If the user chooses to remove the file from the list, we abort any ongoing upload and remove the session and file from state.
     const session = sessionsRef.current[id];
     session?.controller?.abort();
     clearResumableUpload(session?.fileHash);
@@ -309,13 +328,16 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     const session = sessionsRef.current[id];
     if (!session) return;
 
+    // Compute the file hash
     const fileHash = await handleGetHash(session.file);
     session.fileHash = fileHash;
 
+    // Check if there's a resumable upload record in localStorage
     const record = getResumableUpload(fileHash);
     const hasUnfinishedUpload =
       record !== null && record.uploadedChunks < record.totalChunks;
 
+    // If there's no unfinished upload, start a fresh upload
     if (!hasUnfinishedUpload) {
       handleStartUpload(id);
       return;
@@ -331,6 +353,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   const handleAddFiles = (newFiles: File[]) => {
     const newItems: UploadFileItem[] = [];
 
+    // Store dropped files in sessionsRef and create corresponding UploadFileItem objects
     for (const file of newFiles) {
       const id = crypto.randomUUID();
       sessionsRef.current[id] = {
@@ -356,6 +379,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
 
     setFiles((prev) => [...prev, ...newItems]);
 
+    // Detect resumable uploads for the newly added files
     for (const item of newItems) {
       handleDetectResumableUpload(item.id);
     }

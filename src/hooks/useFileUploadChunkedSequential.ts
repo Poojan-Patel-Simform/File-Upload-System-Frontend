@@ -14,6 +14,7 @@ const sendChunksSequentially: UploadChunk = async ({
   reportChunkUploaded,
   reportLastChunkClaimed,
 }) => {
+  // If the session is paused, we store the remaining chunks and return a paused status
   for (let i = 0; i < chunks.length; i++) {
     if (session.isPaused) {
       session.remainingChunks = chunks.slice(i);
@@ -25,6 +26,7 @@ const sendChunksSequentially: UploadChunk = async ({
     if (isLastChunk) reportLastChunkClaimed();
 
     try {
+      // Call the upload chunk API
       await uploadChunk(
         chunk,
         uploadId,

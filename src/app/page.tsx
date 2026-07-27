@@ -5,16 +5,19 @@ import UploadFileListItem from "@/components/UploadFileListItem";
 
 import useFileUploadTraditional from "@/hooks/useFileUploadTraditional";
 
-// Thin container: all upload state/logic lives in useFileUploadTraditional,
-// this page just wires its output to Dropzone/UploadFileListItem.
 const Home = () => {
-  const { files, addFiles, handleUpload, handleCancel, removeFile } =
-    useFileUploadTraditional();
+  const {
+    files,
+    handleAddFiles,
+    handleUpload,
+    handleCancel,
+    handleRemoveFile,
+  } = useFileUploadTraditional();
 
   return (
     <div className="flex flex-col gap-6 px-5">
       <div className="flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/3 p-6 shadow-2xl shadow-black/20 backdrop-blur-sm">
-        <Dropzone onAddFiles={addFiles} />
+        <Dropzone onAddFiles={handleAddFiles} />
       </div>
 
       {files.length > 0 && (
@@ -25,7 +28,7 @@ const Home = () => {
               item={item}
               onRetry={handleUpload}
               onCancel={handleCancel}
-              onRemove={removeFile}
+              onRemove={handleRemoveFile}
             />
           ))}
         </div>

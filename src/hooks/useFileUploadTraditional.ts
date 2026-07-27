@@ -25,6 +25,25 @@ const useFileUploadTraditional = () => {
     );
   };
 
+  const handleCancel = (id: string) => {
+    abortControllersRef.current[id]?.abort();
+    delete abortControllersRef.current[id];
+
+    updateFile(id, {
+      status: FileUploadingStatusEnum.IDLE,
+      progress: 0,
+      errorMessage: null,
+    });
+    appendLog(id, "[upload] cancelled, state reset");
+  };
+
+  const handleRemoveFile = (id: string) => {
+    abortControllersRef.current[id]?.abort();
+    delete abortControllersRef.current[id];
+    delete fileMapRef.current[id];
+    setFiles((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const handleUpload = async (id: string) => {
     const file = fileMapRef.current[id];
     if (!file) return;
@@ -47,6 +66,7 @@ const useFileUploadTraditional = () => {
       formData.append("fileName", file.name);
       formData.append("fileSize", String(file.size));
 
+      // API call to upload the file
       const response = await api.post("/uploads/single", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         signal: abortController.signal,
@@ -86,7 +106,7 @@ const useFileUploadTraditional = () => {
     }
   };
 
-  const addFiles = (newFiles: File[]) => {
+  const handleAddFiles = (newFiles: File[]) => {
     const newItems: UploadFileItem[] = [];
 
     for (const file of newFiles) {
@@ -105,36 +125,18 @@ const useFileUploadTraditional = () => {
 
     setFiles((prev) => [...prev, ...newItems]);
 
+    // Automatically start uploading the newly added files
     for (const item of newItems) {
-      void handleUpload(item.id);
+      handleUpload(item.id);
     }
-  };
-
-  const handleCancel = (id: string) => {
-    abortControllersRef.current[id]?.abort();
-    delete abortControllersRef.current[id];
-
-    updateFile(id, {
-      status: FileUploadingStatusEnum.IDLE,
-      progress: 0,
-      errorMessage: null,
-    });
-    appendLog(id, "[upload] cancelled, state reset");
-  };
-
-  const removeFile = (id: string) => {
-    abortControllersRef.current[id]?.abort();
-    delete abortControllersRef.current[id];
-    delete fileMapRef.current[id];
-    setFiles((prev) => prev.filter((item) => item.id !== id));
   };
 
   return {
     files,
-    addFiles,
+    handleAddFiles,
     handleUpload,
     handleCancel,
-    removeFile,
+    handleRemoveFile,
   };
 };
 
