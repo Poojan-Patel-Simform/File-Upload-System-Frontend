@@ -1,9 +1,9 @@
 "use client";
 
-import Dropzone from "@/components/Dropzone";
-import UploadFileListItem from "@/components/UploadFileListItem";
+import Dropzone from "@/components/upload/Dropzone";
+import UploadFileListItem from "@/components/upload/UploadFileListItem";
 
-import useFileUploadTraditional from "@/hooks/useFileUploadTraditional";
+import useFileUploadTraditional from "@/hooks/upload/useFileUploadTraditional";
 
 const Home = () => {
   const {

@@ -1,9 +1,11 @@
-import { FileType, FileUploadingStatusEnum } from "@/types/file";
+import { FileType, FileUploadingStatusEnum } from "@/types/upload/file";
+import { UploadStatus } from "@/types/local-uploads/adminApi";
 import {
   AlertTriangle,
   CheckCircle2,
   Cloud,
   Cpu,
+  Database,
   File,
   FileArchive,
   FileAudio,
@@ -76,6 +78,38 @@ export const STATUS_META: Record<
   },
 };
 
+// Upload admin status
+export const UPLOAD_STATUS_META: Record<
+  UploadStatus,
+  { label: string; icon: typeof Loader2; className: string }
+> = {
+  NEW: {
+    label: "New",
+    icon: Loader2,
+    className: "text-muted-foreground",
+  },
+  UPLOADING: {
+    label: "Uploading",
+    icon: Loader2,
+    className: "text-primary",
+  },
+  MERGING: {
+    label: "Merging",
+    icon: GitMerge,
+    className: "text-primary",
+  },
+  COMPLETED: {
+    label: "Completed",
+    icon: CheckCircle2,
+    className: "text-emerald-400",
+  },
+  FAILED: {
+    label: "Failed",
+    icon: AlertTriangle,
+    className: "text-destructive",
+  },
+};
+
 // Retry
 export const DEFAULT_RETRIES = 3;
 export const DEFAULT_BASE_DELAY_MS = 500;
@@ -86,6 +120,10 @@ export const CLOUDINARY_MIN_CHUNK_SIZE = 6 * 1024 * 1024;
 export const CLOUDINARY_WORKER_POOL_CONCURRENCY = 4;
 export const CLOUDINARY_SIGN_ENDPOINT = "/cloudinary/sign";
 export const CLOUDINARY_SAVE_ENDPOINT = "/cloudinary/save";
+export const CLOUDINARY_ENDPOINT = "/cloudinary";
+
+// Uploads admin
+export const UPLOADS_ENDPOINT = "/uploads";
 
 // Strategy tab
 export const STRATEGY_LIST = [
@@ -96,17 +134,31 @@ export const STRATEGY_LIST = [
   },
   {
     title: "Chunk · Sequential",
-    path: "/chunk/sequential",
+    path: "/strategies/sequential",
     icon: ListOrdered,
   },
   {
     title: "Chunk · Worker Pool",
-    path: "/chunk/worker-pool",
+    path: "/strategies/worker-pool",
     icon: Cpu,
   },
   {
     title: "Cloudinary · Worker Pool",
-    path: "/chunk/cloudinary",
+    path: "/strategies/cloudinary",
+    icon: Cloud,
+  },
+];
+
+// Admin nav
+export const ADMIN_NAV_LIST = [
+  {
+    title: "Local Uploads",
+    path: "/local-uploads",
+    icon: Database,
+  },
+  {
+    title: "Cloudinary Assets",
+    path: "/cloudinary",
     icon: Cloud,
   },
 ];

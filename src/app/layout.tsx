@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans, Noto_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import Navbar from "@/components/Navbar";
-import StrategyTab from "@/components/StrategyTab";
+import Navbar from "@/components/common/Navbar";
+import StrategyTab from "@/components/common/StrategyTab";
+import AdminNavTab from "@/components/common/AdminNavTab";
 
 const notoSansHeading = Noto_Sans({
   subsets: ["latin"],
@@ -48,9 +50,13 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col gap-8 pb-16">
         <Navbar />
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
-          <StrategyTab />
+          <div className="flex flex-wrap gap-3">
+            <StrategyTab />
+            <AdminNavTab />
+          </div>
           {children}
         </div>
+        <Toaster theme="dark" richColors position="bottom-right" />
       </body>
     </html>
   );
