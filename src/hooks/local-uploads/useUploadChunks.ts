@@ -5,7 +5,7 @@ import {
   deleteAllChunks,
   deleteChunk,
   listChunks,
-} from "@/lib/local-uploads/localUploadsAdminService";
+} from "@/api/local-uploads/localUploadsAdminApi";
 import { ChunksInspection } from "@/types/local-uploads/adminApi";
 
 const useUploadChunks = (uploadId: string) => {

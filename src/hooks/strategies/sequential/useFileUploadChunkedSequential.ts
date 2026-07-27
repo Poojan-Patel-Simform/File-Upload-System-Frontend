@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadChunk } from "@/lib/upload/uploadChunkService";
+import { uploadChunk } from "@/api/upload/uploadApi";
 import { DEFAULT_RETRIES } from "@/constants";
 import { runWorkerPool } from "@/lib/upload/workerPool";
 import useFileUploadChunkedBase from "@/hooks/upload/useFileUploadChunkedBase";

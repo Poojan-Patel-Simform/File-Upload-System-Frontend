@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import {
   deleteCloudinaryAsset,
   getCloudinaryAsset,
-} from "@/lib/cloudinary/cloudinaryAdminService";
+} from "@/api/cloudinary/cloudinaryAdminApi";
 import { CloudinaryAssetItem } from "@/types/cloudinary/adminApi";
 
 const cloudinaryDeleteErrorMessage = (err: unknown): string => {

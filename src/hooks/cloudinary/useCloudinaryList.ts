@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { listCloudinaryAssets } from "@/lib/cloudinary/cloudinaryAdminService";
+import { listCloudinaryAssets } from "@/api/cloudinary/cloudinaryAdminApi";
 import { CloudinaryAssetItem } from "@/types/cloudinary/adminApi";
 
 const TAKE = 20;

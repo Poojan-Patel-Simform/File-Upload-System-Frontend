@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import useUploadChunks from "@/hooks/local-uploads/useUploadChunks";
-import { getChunk } from "@/lib/local-uploads/localUploadsAdminService";
+import { getChunk } from "@/api/local-uploads/localUploadsAdminApi";
 
 const useChunkInspector = (uploadId: string) => {
   const { chunks, isLoading, error, removeChunk, removeAllChunks } =

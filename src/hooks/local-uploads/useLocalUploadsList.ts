@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { listLocalUploads } from "@/lib/local-uploads/localUploadsAdminService";
+import { listLocalUploads } from "@/api/local-uploads/localUploadsAdminApi";
 import { LocalUploadListItem, UploadStatus } from "@/types/local-uploads/adminApi";
 
 const TAKE = 20;

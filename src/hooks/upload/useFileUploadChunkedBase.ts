@@ -18,7 +18,7 @@ import {
   getResumableUpload,
   putResumableUpload,
 } from "@/lib/upload/localStorageService";
-import api from "@/lib/axios";
+import { initUpload, abortUpload } from "@/api/upload/uploadApi";
 import { UploadRecord } from "@/types/upload/upload";
 
 type PropsType = {
@@ -147,14 +147,13 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     }
 
     // Call the server to initialize the upload and check if it's already completed
-    const response = await api.post("/uploads/init", {
+    const initData: InitUploadResponse = await initUpload({
       fileHash: session.fileHash,
       fileName: session.file.name,
       fileSize: session.file.size,
       totalChunks: chunks.length,
     });
 
-    const initData: InitUploadResponse = response.data;
     if (!initData.success) throw new Error("Failed to initialize upload");
 
     const { uploadId, status: initStatus, uploadedChunks = [] } = initData.data;
@@ -246,7 +245,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     if (record) {
       try {
         // Call the server to abort the previous upload
-        await api.delete(`/uploads/${record.uploadId}`);
+        await abortUpload(record.uploadId);
         appendLog(id, "[resume] aborted previous upload on the server");
       } catch {
         appendLog(

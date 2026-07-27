@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import useCloudinaryList from "@/hooks/cloudinary/useCloudinaryList";
-import { deleteCloudinaryAsset } from "@/lib/cloudinary/cloudinaryAdminService";
+import { deleteCloudinaryAsset } from "@/api/cloudinary/cloudinaryAdminApi";
 
 const cloudinaryDeleteErrorMessage = (err: unknown): string => {
   if (axios.isAxiosError(err)) {

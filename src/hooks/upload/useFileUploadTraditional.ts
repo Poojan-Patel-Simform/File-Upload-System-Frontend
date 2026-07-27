@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import api from "@/lib/axios";
+import { uploadSingleFile } from "@/api/upload/uploadApi";
 import { FileUploadingStatusEnum, UploadFileItem } from "@/types/upload/file";
 
 const useFileUploadTraditional = () => {
@@ -61,25 +61,14 @@ const useFileUploadTraditional = () => {
     abortControllersRef.current[id] = abortController;
 
     try {
-      const formData = new FormData();
-      formData.append("file", file, file.name);
-      formData.append("fileName", file.name);
-      formData.append("fileSize", String(file.size));
-
       // API call to upload the file
-      const response = await api.post("/uploads/single", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        signal: abortController.signal,
-        onUploadProgress: (progressEvent) => {
-          if (!progressEvent.total) return;
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total,
-          );
-          updateFile(id, { progress: percent });
-        },
-      });
+      const result = await uploadSingleFile(
+        file,
+        abortController.signal,
+        (percent) => updateFile(id, { progress: percent }),
+      );
 
-      if (!response.data?.success) {
+      if (!result.success) {
         throw new Error("Upload failed");
       }
 

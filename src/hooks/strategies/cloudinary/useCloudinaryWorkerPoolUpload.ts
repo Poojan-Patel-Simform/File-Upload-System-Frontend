@@ -7,6 +7,8 @@ import { DEFAULT_RETRIES } from "@/constants";
 import {
   signCloudinaryUpload,
   saveCloudinaryAsset,
+} from "@/api/cloudinary/cloudinaryApi";
+import {
   runCloudinaryChunkedUpload,
   createSession,
 } from "@/lib/cloudinary/cloudinaryService";

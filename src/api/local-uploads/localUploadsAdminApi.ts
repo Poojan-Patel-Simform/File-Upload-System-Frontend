@@ -1,5 +1,5 @@
 import axios from "axios";
-import api from "@/lib/axios";
+import api from "@/api/client";
 import { unwrapEnvelope } from "@/lib/apiEnvelope";
 import { UPLOADS_ENDPOINT } from "@/constants";
 import { ApiEnvelope, PaginatedResult } from "@/types/common";

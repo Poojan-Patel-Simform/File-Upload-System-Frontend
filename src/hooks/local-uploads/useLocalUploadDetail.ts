@@ -7,7 +7,7 @@ import {
   deleteLocalUploadPermanent,
   downloadLocalUpload,
   getLocalUpload,
-} from "@/lib/local-uploads/localUploadsAdminService";
+} from "@/api/local-uploads/localUploadsAdminApi";
 import { LocalUploadListItem } from "@/types/local-uploads/adminApi";
 
 const useLocalUploadDetail = (uploadId: string) => {

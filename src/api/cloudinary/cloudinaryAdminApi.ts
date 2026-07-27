@@ -1,4 +1,4 @@
-import api from "@/lib/axios";
+import api from "@/api/client";
 import { unwrapEnvelope } from "@/lib/apiEnvelope";
 import { CLOUDINARY_ENDPOINT } from "@/constants";
 import { ApiEnvelope, PaginatedResult } from "@/types/common";

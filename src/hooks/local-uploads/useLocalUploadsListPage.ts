@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import useLocalUploadsList from "@/hooks/local-uploads/useLocalUploadsList";
-import { downloadLocalUpload, deleteLocalUploadPermanent } from "@/lib/local-uploads/localUploadsAdminService";
+import { downloadLocalUpload, deleteLocalUploadPermanent } from "@/api/local-uploads/localUploadsAdminApi";
 
 const useLocalUploadsListPage = () => {
   const router = useRouter();
