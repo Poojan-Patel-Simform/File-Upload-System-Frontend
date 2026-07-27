@@ -15,7 +15,16 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
   return `${parseFloat(value.toFixed(decimals))} ${units[i]}`;
 };
 
-import { FileType } from "@/types/upload/file";
+import { FileType, FileUploadingStatusEnum, UploadFileItem } from "@/types/upload/file";
+
+export const createUploadFileItem = (id: string, file: File): UploadFileItem => ({
+  id,
+  file,
+  status: FileUploadingStatusEnum.IDLE,
+  progress: 0,
+  errorMessage: null,
+  logs: [],
+});
 
 export const getFileType = (file: File | string): FileType => {
   const mimeType = typeof file === "string" ? "" : file.type.toLowerCase();

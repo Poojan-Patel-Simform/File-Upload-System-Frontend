@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { FileUploadingStatusEnum, UploadFileItem } from "@/types/upload/file";
 import { CloudinarySession } from "@/types/cloudinary/cloudinary";
 import { DEFAULT_RETRIES } from "@/constants";
@@ -10,33 +10,21 @@ import {
   runCloudinaryChunkedUpload,
   createSession,
 } from "@/lib/cloudinary/cloudinaryService";
+import { createUploadFileItem } from "@/lib/upload/fileService";
 import {
   deleteUploadRecord,
   getUploadRecord,
   saveUploadRecord,
 } from "@/lib/upload/indexDbService";
 import useHash from "@/hooks/upload/useHash";
+import useUploadFilesState from "@/hooks/upload/useUploadFilesState";
 
 const useCloudinaryWorkerPoolUpload = () => {
-  const [files, setFiles] = useState<UploadFileItem[]>([]);
+  const { files, setFiles, updateFile, appendLog } = useUploadFilesState();
 
   const sessionsRef = useRef<Record<string, CloudinarySession>>({});
   const expiredIdsRef = useRef<Set<string>>(new Set());
   const { handleGetHash } = useHash();
-
-  const updateFile = (id: string, patch: Partial<UploadFileItem>) => {
-    setFiles((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
-    );
-  };
-
-  const appendLog = (id: string, line: string) => {
-    setFiles((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, logs: [...item.logs, line] } : item,
-      ),
-    );
-  };
 
   const updateProgress = (id: string) => {
     const session = sessionsRef.current[id];
@@ -323,14 +311,7 @@ const useCloudinaryWorkerPoolUpload = () => {
     for (const file of newFiles) {
       const id = crypto.randomUUID();
       sessionsRef.current[id] = createSession(file);
-      newItems.push({
-        id,
-        file,
-        status: FileUploadingStatusEnum.IDLE,
-        progress: 0,
-        errorMessage: null,
-        logs: [],
-      });
+      newItems.push(createUploadFileItem(id, file));
     }
 
     setFiles((prev) => [...prev, ...newItems]);

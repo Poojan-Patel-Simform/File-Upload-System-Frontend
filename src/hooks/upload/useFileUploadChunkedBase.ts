@@ -6,10 +6,12 @@ import {
   UploadFileItem,
 } from "@/types/upload/file";
 import { UploadChunk, UploadSession } from "@/types/upload/upload";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import useHash from "./useHash";
+import useUploadFilesState from "./useUploadFilesState";
 import { DEFAULT_RETRIES } from "@/constants";
 import { generateFileChunks } from "@/lib/upload/chunkService";
+import { createUploadFileItem } from "@/lib/upload/fileService";
 import { mapServerStatusToClientStatus } from "@/lib/upload/statusMappingService";
 import {
   clearResumableUpload,
@@ -25,24 +27,10 @@ type PropsType = {
 };
 
 const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
-  const [files, setFiles] = useState<UploadFileItem[]>([]);
+  const { files, setFiles, updateFile, appendLog } = useUploadFilesState();
   const { handleGetHash } = useHash();
 
   const sessionsRef = useRef<Record<string, UploadSession>>({});
-
-  const updateFile = (id: string, patch: Partial<UploadFileItem>) => {
-    setFiles((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item)),
-    );
-  };
-
-  const appendLog = (id: string, line: string) => {
-    setFiles((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, logs: [...item.logs, line] } : item,
-      ),
-    );
-  };
 
   const updateProgress = (id: string) => {
     const session = sessionsRef.current[id];
@@ -367,14 +355,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
         totalChunks: 0,
       };
 
-      newItems.push({
-        id,
-        file,
-        status: FileUploadingStatusEnum.IDLE,
-        progress: 0,
-        errorMessage: null,
-        logs: [],
-      });
+      newItems.push(createUploadFileItem(id, file));
     }
 
     setFiles((prev) => [...prev, ...newItems]);
