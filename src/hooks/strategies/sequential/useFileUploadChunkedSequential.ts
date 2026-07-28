@@ -2,7 +2,6 @@
 
 import { uploadChunk } from "@/api/upload/uploadApi";
 import { DEFAULT_RETRIES } from "@/constants";
-import { runWorkerPool } from "@/lib/upload/workerPool";
 import useFileUploadChunkedBase from "@/hooks/upload/useFileUploadChunkedBase";
 import { UploadChunk } from "@/types/upload/upload";
 
@@ -15,31 +14,38 @@ const sendChunksSequentially: UploadChunk = async ({
   reportChunkUploaded,
   reportLastChunkClaimed,
 }) => {
-  const result = await runWorkerPool(chunks, 1, {
-    isAborted: () => controller.signal.aborted,
-    isPaused: () => session.isPaused,
-    uploadOne: async (chunk, isLastChunk) => {
-      if (isLastChunk) reportLastChunkClaimed();
+  for (let index = 0; index < chunks.length; index++) {
+    if (controller.signal.aborted) return { status: "cancelled" };
 
-      await uploadChunk(
-        chunk,
-        uploadId,
-        controller.signal,
-        (attempt, delayMs) =>
-          appendLog(
-            `[upload] chunk ${chunk.index} failed (attempt ${attempt}/${DEFAULT_RETRIES}), retrying in ${Math.round(delayMs)}ms`,
-          ),
+    if (session.isPaused) {
+      session.remainingChunks = chunks.slice(index);
+      return { status: "paused" };
+    }
+
+    const chunk = chunks[index];
+    const isLastChunk = index === chunks.length - 1;
+    if (isLastChunk) reportLastChunkClaimed();
+
+    try {
+      await uploadChunk(chunk, uploadId, controller.signal, (attempt, delayMs) =>
+        appendLog(
+          `[upload] chunk ${chunk.index} failed (attempt ${attempt}/${DEFAULT_RETRIES}), retrying in ${Math.round(delayMs)}ms`,
+        ),
       );
-    },
-    onChunkDone: reportChunkUploaded,
-  });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return { status: "cancelled" };
+      }
+      return {
+        status: "error",
+        error: err instanceof Error ? err : new Error("Unknown upload error"),
+      };
+    }
 
-  if (result.status === "paused") {
-    session.remainingChunks = chunks.slice(result.pausedAtIndex);
-    return { status: "paused" };
+    reportChunkUploaded(chunk);
   }
 
-  return result;
+  return { status: "completed" };
 };
 
 const useFileUploadChunkedSequential = () =>

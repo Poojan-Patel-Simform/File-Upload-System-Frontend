@@ -11,8 +11,7 @@ export type WorkerPoolOptions<T> = {
   onChunkDone?: (chunk: T) => void;
 };
 
-// Shared concurrency-limited chunk uploader. A single worker (concurrency: 1)
-// behaves as a plain sequential loop, so this also backs the sequential strategy.
+// Shared concurrency-limited chunk uploader.
 export const runWorkerPool = async <T>(
   chunks: T[],
   concurrency: number,
