@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import useUploadChunks from "@/hooks/local-uploads/useUploadChunks";
 import { getChunk } from "@/api/local-uploads/localUploadsAdminApi";
 
+/**
+ * State and actions for the chunk grid of one upload: checksum dialog, single delete, clear all.
+ */
 const useChunkInspector = (uploadId: string) => {
   const { chunks, isLoading, error, removeChunk, removeAllChunks } =
     useUploadChunks(uploadId);

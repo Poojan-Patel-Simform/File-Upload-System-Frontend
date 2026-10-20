@@ -3,6 +3,7 @@
 import useLocalUploadsListPage from "@/hooks/local-uploads/useLocalUploadsListPage";
 import LocalUploadsListView from "@/components/local-uploads/LocalUploadsListView";
 
+/** Route "/local-uploads": admin list of locally stored uploads. */
 const LocalUploadsPage = () => {
   const {
     status,

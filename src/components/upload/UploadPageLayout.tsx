@@ -16,6 +16,7 @@ type PropsType = {
   onStartFresh?: (id: string) => void;
 };
 
+/** Shared upload page body: a dropzone plus one card per file. Pause/resume/remove/resume-detected/start-fresh handlers are optional so simpler strategies can omit those controls. */
 const UploadPageLayout = ({
   files,
   onAddFiles,

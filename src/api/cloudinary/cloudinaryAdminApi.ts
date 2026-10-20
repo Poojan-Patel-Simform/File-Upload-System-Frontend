@@ -7,8 +7,10 @@ import {
   CloudinaryDeleteResult,
 } from "@/types/cloudinary/adminApi";
 
+/** Pagination params for the admin list endpoint. */
 type ListParams = { take: number; skip: number };
 
+/** Fetches a page of saved Cloudinary assets. */
 export const listCloudinaryAssets = async (
   params: ListParams,
 ): Promise<PaginatedResult<CloudinaryAssetItem>> => {
@@ -19,6 +21,7 @@ export const listCloudinaryAssets = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Fetches a single saved Cloudinary asset by id. */
 export const getCloudinaryAsset = async (
   id: string,
 ): Promise<CloudinaryAssetItem> => {
@@ -29,6 +32,7 @@ export const getCloudinaryAsset = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Deletes an asset from Cloudinary and the local record. */
 export const deleteCloudinaryAsset = async (
   id: string,
 ): Promise<CloudinaryDeleteResult> => {

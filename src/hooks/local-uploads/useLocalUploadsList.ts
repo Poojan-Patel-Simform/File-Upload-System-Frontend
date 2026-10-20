@@ -4,8 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { listLocalUploads } from "@/api/local-uploads/localUploadsAdminApi";
 import { LocalUploadListItem, UploadStatus } from "@/types/local-uploads/adminApi";
 
+/** Page size. */
 const TAKE = 20;
 
+/** Fetches the paginated, status-filtered list of local uploads. */
 const useLocalUploadsList = () => {
   const [status, setStatus] = useState<UploadStatus | "">("");
   const [skip, setSkip] = useState(0);
@@ -42,6 +44,7 @@ const useLocalUploadsList = () => {
     fetchLocalUploads();
   }, [fetchLocalUploads]);
 
+  // Reset to the first page, otherwise the old offset may exceed the filtered total.
   const handleStatusChange = (nextStatus: UploadStatus | "") => {
     setStatus(nextStatus);
     setSkip(0);

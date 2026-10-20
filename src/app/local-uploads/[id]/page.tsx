@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import useLocalUploadDetail from "@/hooks/local-uploads/useLocalUploadDetail";
 import LocalUploadDetailView from "@/components/local-uploads/LocalUploadDetailView";
 
+/** Route "/local-uploads/[id]": detail view for one local upload. */
 const LocalUploadDetailPage = () => {
   const params = useParams<{ id: string }>();
   const uploadId = params.id;

@@ -8,6 +8,7 @@ type PaginationProps = {
   onSkipChange: (skip: number) => void;
 };
 
+/** Prev/Next controls with a "Showing x-y of total" label; skip is the zero-based offset, take the page size. */
 const Pagination = ({ take, skip, total, onSkipChange }: PaginationProps) => {
   const from = total === 0 ? 0 : skip + 1;
   const to = Math.min(skip + take, total);

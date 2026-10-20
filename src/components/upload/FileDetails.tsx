@@ -8,6 +8,7 @@ type PropsType = {
   file: File | null;
 };
 
+/** Shows a file's preview (image/video) or type icon, name, and size for the given File. */
 const FileDetails = ({ file }: PropsType) => {
   const fileType = file ? getFileType(file.name) : "unknown";
   const canPreview = fileType === "image" || fileType === "video";

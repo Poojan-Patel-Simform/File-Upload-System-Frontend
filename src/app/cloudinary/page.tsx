@@ -3,6 +3,7 @@
 import useCloudinaryListPage from "@/hooks/cloudinary/useCloudinaryListPage";
 import CloudinaryListView from "@/components/cloudinary/CloudinaryListView";
 
+/** Route "/cloudinary": admin list of Cloudinary assets. */
 const CloudinaryPage = () => {
   const {
     take,

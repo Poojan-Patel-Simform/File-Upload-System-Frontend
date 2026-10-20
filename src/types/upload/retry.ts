@@ -1,3 +1,4 @@
+/** Options for withRetry; unset values fall back to the defaults in constants. */
 export type RetryOptions = {
   retries?: number;
   baseDelayMs?: number;

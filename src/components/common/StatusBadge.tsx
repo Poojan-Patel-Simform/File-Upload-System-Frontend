@@ -2,6 +2,7 @@ import { UPLOAD_STATUS_META } from "@/constants";
 import { UploadStatus } from "@/types/local-uploads/adminApi";
 import { cn } from "@/lib/utils";
 
+/** Colored badge with icon for a server-side UploadStatus. */
 const StatusBadge = ({ status }: { status: UploadStatus }) => {
   const meta = UPLOAD_STATUS_META[status];
   const Icon = meta.icon;

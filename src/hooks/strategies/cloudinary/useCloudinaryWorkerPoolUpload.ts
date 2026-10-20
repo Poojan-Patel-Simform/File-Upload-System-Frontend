@@ -21,13 +21,16 @@ import {
 import useHash from "@/hooks/upload/useHash";
 import useUploadFilesState from "@/hooks/upload/useUploadFilesState";
 
+/** Uploads files straight to Cloudinary in parallel chunks, with pause/resume persisted in IndexedDB. */
 const useCloudinaryWorkerPoolUpload = () => {
   const { files, setFiles, updateFile, appendLog } = useUploadFilesState();
 
   const sessionsRef = useRef<Record<string, CloudinarySession>>({});
+  // Ids whose Cloudinary session expired; a retry must create a new session.
   const expiredIdsRef = useRef<Set<string>>(new Set());
   const { handleGetHash } = useHash();
 
+  /** Recomputes progress from the completed chunk set. */
   const updateProgress = (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -40,6 +43,7 @@ const useCloudinaryWorkerPoolUpload = () => {
     updateFile(id, { progress: percent });
   };
 
+  /** Hash, sign, upload missing chunks, then persist the asset; also used to resume (skips completed chunks). */
   const handleBeginUpload = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -118,6 +122,7 @@ const useCloudinaryWorkerPoolUpload = () => {
           session.resultUrl = chunkResult.secure_url;
         }
 
+        // Persist after every chunk so a reload can resume from here.
         saveUploadRecord({
           fileKey: session.fileKey,
           // fileHash is guaranteed set by this point — hashing always
@@ -204,12 +209,14 @@ const useCloudinaryWorkerPoolUpload = () => {
     }
   };
 
+  /** User chose "resume" on a record found in IndexedDB. */
   const handleResumeDetected = (id: string) => {
     appendLog(id, "[resume] resuming previous upload");
     updateFile(id, { resumableUploadId: undefined });
     handleBeginUpload(id);
   };
 
+  /** Discards the saved record and replaces the session with a brand new one. */
   const handleStartFresh = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -231,16 +238,19 @@ const useCloudinaryWorkerPoolUpload = () => {
       : handleBeginUpload(id);
   };
 
+  /** Pauses by aborting in-flight requests; completed chunks are already recorded, so resume loses little. */
   const handlePause = (id: string) => {
     appendLog(id, "[upload] pause requested");
     sessionsRef.current[id]?.controller?.abort();
   };
 
+  /** Resumes a paused upload by re-signing and uploading the chunks not yet completed. */
   const handleResume = (id: string) => {
     appendLog(id, "[upload] resuming");
     handleBeginUpload(id);
   };
 
+  /** Aborts, deletes the saved record and resets the item to a fresh session. */
   const handleCancel = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -259,6 +269,7 @@ const useCloudinaryWorkerPoolUpload = () => {
     });
   };
 
+  /** Removes the file from the list and aborts any in-flight upload. */
   const handleRemoveFile = (id: string) => {
     sessionsRef.current[id]?.controller?.abort();
     delete sessionsRef.current[id];
@@ -266,6 +277,7 @@ const useCloudinaryWorkerPoolUpload = () => {
     setFiles((prev) => prev.filter((item) => item.id !== id));
   };
 
+  /** Looks up an IndexedDB record for the file: starts fresh if none, otherwise restores the session and prompts to resume. */
   const handleDetectResumableSession = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -307,6 +319,7 @@ const useCloudinaryWorkerPoolUpload = () => {
     updateFile(id, { resumableUploadId: record.uploadSessionId });
   };
 
+  /** Registers new files (item + session each) and checks them for resumable uploads. */
   const handleAddFiles = (newFiles: File[]) => {
     const newItems: UploadFileItem[] = [];
 

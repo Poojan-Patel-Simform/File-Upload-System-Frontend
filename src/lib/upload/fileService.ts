@@ -1,3 +1,4 @@
+/** Formats a byte count as a human-readable string (e.g. "1.5 MB"); throws on negative or non-finite input. */
 export const formatBytes = (bytes: number, decimals: number = 2): string => {
   if (!Number.isFinite(bytes) || bytes < 0) {
     throw new Error("Bytes must be a non-negative number");
@@ -17,6 +18,7 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
 
 import { FileType, FileUploadingStatusEnum, UploadFileItem } from "@/types/upload/file";
 
+/** Creates a fresh list item for a newly added file, in the IDLE state. */
 export const createUploadFileItem = (id: string, file: File): UploadFileItem => ({
   id,
   file,
@@ -26,6 +28,7 @@ export const createUploadFileItem = (id: string, file: File): UploadFileItem => 
   logs: [],
 });
 
+/** Classifies a File (or file name) into a coarse FileType, preferring MIME type over extension. */
 export const getFileType = (file: File | string): FileType => {
   const mimeType = typeof file === "string" ? "" : file.type.toLowerCase();
 

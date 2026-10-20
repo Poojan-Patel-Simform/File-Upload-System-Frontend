@@ -26,12 +26,21 @@ type PropsType = {
   onUploadChunks: UploadChunk;
 };
 
+/**
+ * Shared chunked-upload logic (init, resume, pause, cancel); strategies plug in only how chunks are sent.
+ *
+ * @param strategy - recorded in the resume record
+ * @param onUploadChunks - sends the remaining chunks and reports the outcome
+ */
 const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
   const { files, setFiles, updateFile, appendLog } = useUploadFilesState();
   const { handleGetHash } = useHash();
 
+  // Mutable per-file upload state, kept in a ref so the chunk loop always
+  // sees the latest pause/abort flags without waiting for a re-render.
   const sessionsRef = useRef<Record<string, UploadSession>>({});
 
+  /** Recomputes progress and persists the resume record to localStorage. */
   const updateProgress = (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -59,6 +68,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     });
   };
 
+  /** Runs the strategy over the session's remaining chunks and maps its result to UI state. */
   const handleUploadRemainingChunks = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session || !session.uploadId) return;
@@ -83,6 +93,8 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
           `[upload] chunk ${chunk.index} uploaded (${session.uploadedCount}/${session.totalChunks})`,
         );
       },
+      // Fired when the last chunk is picked up (not finished), since the
+      // server starts merging as soon as that final chunk arrives.
       reportLastChunkClaimed: () => {
         updateFile(id, { status: FileUploadingStatusEnum.MERGING });
         appendLog(
@@ -130,6 +142,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     }
   };
 
+  /** Hashes the file, registers it with the server, and works out which chunks still need uploading (dedup/resume). */
   const handleInitializeUploadOnServer = async (
     id: string,
     session: UploadSession,
@@ -194,6 +207,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     return { alreadyCompleted: false };
   };
 
+  /** Starts (or restarts) the upload: init on the server, then send remaining chunks. */
   const handleUpload = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -223,6 +237,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     }
   };
 
+  /** Clears any pending resume prompt and begins the upload. */
   const handleStartUpload = (id: string) => {
     updateFile(id, {
       status: FileUploadingStatusEnum.IDLE,
@@ -231,12 +246,14 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     handleUpload(id);
   };
 
+  /** User chose "resume" on a detected previous upload; the server reports which chunks it already has. */
   const handleResumeDetected = (id: string) => {
     // If a resumable upload is detected, we can resume the upload by calling handleUpload with the existing session.
     appendLog(id, "[resume] resuming previous upload");
     handleStartUpload(id);
   };
 
+  /** User chose "start over": discards the previous server session and local record, then uploads from scratch. */
   const handleStartFresh = async (id: string) => {
     // If the user chooses to start a fresh upload, we need to abort any existing resumable upload on the server and clear the localStorage record.
     const session = sessionsRef.current[id];
@@ -260,6 +277,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     handleStartUpload(id);
   };
 
+  /** Requests a pause; the strategy stops before starting its next chunk (in-flight chunks finish). */
   const handlePause = (id: string) => {
     // If the user chooses to pause the upload, we set the isPaused flag in the session to true.
     const session = sessionsRef.current[id];
@@ -267,6 +285,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     appendLog(id, "[upload] pause requested");
   };
 
+  /** Continues a paused upload using the existing server session (no re-init). */
   const handleResume = async (id: string) => {
     // If the user chooses to resume the upload,
     // we set the isPaused flag in the session to false and call handleUploadRemainingChunks to continue uploading the remaining chunks.
@@ -280,6 +299,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     await handleUploadRemainingChunks(id);
   };
 
+  /** Aborts in-flight requests and resets the item so it can be uploaded again. */
   const handleCancel = (id: string) => {
     // If the user chooses to cancel the upload, we abort the current upload request and reset the session state.
     const session = sessionsRef.current[id];
@@ -301,6 +321,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     appendLog(id, "[upload] cancelled, state reset");
   };
 
+  /** Removes the file from the list, aborting any upload and dropping its resume record. */
   const handleRemoveFile = (id: string) => {
     // If the user chooses to remove the file from the list, we abort any ongoing upload and remove the session and file from state.
     const session = sessionsRef.current[id];
@@ -311,6 +332,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     setFiles((prev) => prev.filter((item) => item.id !== id));
   };
 
+  /** Hashes a newly added file and either prompts to resume a previous upload or starts a fresh one. */
   const handleDetectResumableUpload = async (id: string) => {
     const session = sessionsRef.current[id];
     if (!session) return;
@@ -337,6 +359,7 @@ const useFileUploadChunkedBase = ({ strategy, onUploadChunks }: PropsType) => {
     );
   };
 
+  /** Registers new files (item + session each) and checks them for resumable uploads. */
   const handleAddFiles = (newFiles: File[]) => {
     const newItems: UploadFileItem[] = [];
 

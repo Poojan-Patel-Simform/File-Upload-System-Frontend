@@ -1,5 +1,6 @@
 import { FileUploadingStatusEnum, UploadStatus } from "@/types/upload/file";
 
+/** Maps a server-side upload status to the client status enum; unknown values fall back to IDLE. */
 export const mapServerStatusToClientStatus = (
   status: UploadStatus | string,
 ): FileUploadingStatusEnum => {

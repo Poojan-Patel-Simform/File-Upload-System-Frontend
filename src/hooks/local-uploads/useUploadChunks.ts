@@ -8,6 +8,7 @@ import {
 } from "@/api/local-uploads/localUploadsAdminApi";
 import { ChunksInspection } from "@/types/local-uploads/adminApi";
 
+/** Loads an upload's chunk inspection and refetches after deletions. */
 const useUploadChunks = (uploadId: string) => {
   const [chunks, setChunks] = useState<ChunksInspection | null>(null);
   const [isLoading, setIsLoading] = useState(true);

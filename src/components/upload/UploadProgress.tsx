@@ -15,6 +15,7 @@ type PropsType = {
   resultUrl?: string;
 };
 
+/** Status label, progress bar, error message and result link for one upload; renders nothing while IDLE. */
 const UploadProgress = ({
   status,
   progress,

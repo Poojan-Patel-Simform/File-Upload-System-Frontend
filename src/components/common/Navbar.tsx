@@ -1,5 +1,6 @@
 import { Upload } from "lucide-react";
 
+/** Top-level site header with the strategy and admin navigation tabs. */
 const Navbar = () => {
   return (
     <nav className="sticky top-0 z-20 border-b border-white/10 bg-background/70 px-5 py-4 backdrop-blur-xl">

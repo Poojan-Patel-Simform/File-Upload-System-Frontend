@@ -4,6 +4,7 @@ import UploadPageLayout from "@/components/upload/UploadPageLayout";
 
 import useFileUploadTraditional from "@/hooks/upload/useFileUploadTraditional";
 
+/** Route "/": traditional single-request upload page. */
 const Home = () => {
   const {
     files,

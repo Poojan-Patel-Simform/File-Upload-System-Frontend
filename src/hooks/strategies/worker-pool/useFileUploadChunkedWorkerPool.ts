@@ -7,6 +7,7 @@ import { runWorkerPool } from "@/lib/upload/workerPool";
 import useFileUploadChunkedBase from "@/hooks/upload/useFileUploadChunkedBase";
 import { UploadChunk } from "@/types/upload/upload";
 
+/** Strategy: uploads chunks in parallel, with concurrency chosen from network quality. */
 const sendChunksWithWorkerPool: UploadChunk = async ({
   session,
   uploadId,
@@ -37,6 +38,7 @@ const sendChunksWithWorkerPool: UploadChunk = async ({
     onChunkDone: reportChunkUploaded,
   });
 
+  // Save where we stopped so resume only re-sends chunks not yet started.
   if (result.status === "paused") {
     session.remainingChunks = chunks.slice(result.pausedAtIndex);
     return { status: "paused" };
@@ -45,6 +47,7 @@ const sendChunksWithWorkerPool: UploadChunk = async ({
   return result;
 };
 
+/** Chunked upload hook using the parallel worker-pool strategy. */
 const useFileUploadChunkedWorkerPool = () =>
   useFileUploadChunkedBase({
     strategy: "worker-pool",

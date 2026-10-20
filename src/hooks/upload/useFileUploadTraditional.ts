@@ -4,9 +4,11 @@ import { useRef, useState } from "react";
 import { uploadSingleFile } from "@/api/upload/uploadApi";
 import { FileUploadingStatusEnum, UploadFileItem } from "@/types/upload/file";
 
+/** Traditional upload: sends each whole file in a single request, with progress and cancel. */
 const useFileUploadTraditional = () => {
   const [files, setFiles] = useState<UploadFileItem[]>([]);
 
+  // Refs (not state) so File objects and controllers don't trigger re-renders.
   const fileMapRef = useRef<Record<string, File>>({});
 
   const abortControllersRef = useRef<Record<string, AbortController>>({});
@@ -78,6 +80,7 @@ const useFileUploadTraditional = () => {
         progress: 100,
       });
     } catch (err) {
+      // Cancel already reset the item's state, so don't mark it as an error.
       const wasCancelled =
         err instanceof DOMException && err.name === "AbortError";
       if (wasCancelled) {

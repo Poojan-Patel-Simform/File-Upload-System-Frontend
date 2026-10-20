@@ -20,6 +20,7 @@ type LocalUploadDetailViewProps = {
   onCancelDelete: () => void;
 };
 
+/** Presentational detail page for one local upload with download and delete actions; shows loading and not-found states. */
 const LocalUploadDetailView = ({
   upload,
   isLoading,

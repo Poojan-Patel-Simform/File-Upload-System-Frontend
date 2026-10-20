@@ -14,6 +14,7 @@ type PropsType = {
   maxFiles?: number;
 };
 
+/** Drag-and-drop / click-to-pick area that validates files against accept/maxSize/maxFiles and hands accepted ones to onAddFiles; rejections are listed below. */
 const Dropzone = ({
   onAddFiles,
   accept,

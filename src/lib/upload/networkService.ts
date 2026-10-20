@@ -1,6 +1,7 @@
 import { NetworkHint, NetworkInformationLike } from "@/types/upload/network";
 import { DEFAULT_CONCURRENCY } from "@/constants";
 
+/** Suggests upload concurrency from the Network Information API, falling back to the default (SSR/unsupported browsers). */
 export const getNetworkHint = (): NetworkHint => {
   if (typeof navigator === "undefined") {
     return { concurrency: DEFAULT_CONCURRENCY };

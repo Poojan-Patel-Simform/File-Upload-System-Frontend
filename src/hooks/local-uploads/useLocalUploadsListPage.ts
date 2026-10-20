@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import useLocalUploadsList from "@/hooks/local-uploads/useLocalUploadsList";
 import { downloadLocalUpload, deleteLocalUploadPermanent } from "@/api/local-uploads/localUploadsAdminApi";
 
+/** Page-level actions (download, confirm-delete, navigation) on top of useLocalUploadsList. */
 const useLocalUploadsListPage = () => {
   const router = useRouter();
   const {

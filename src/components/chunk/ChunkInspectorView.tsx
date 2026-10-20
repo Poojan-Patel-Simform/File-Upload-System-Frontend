@@ -31,6 +31,7 @@ type ChunkInspectorViewProps = {
   onCancelClearAll: () => void;
 };
 
+/** Presentational grid of chunk squares (received vs missing) with checksum dialog and delete/clear-all confirmations; all state and handlers come from props. */
 const ChunkInspectorView = ({
   chunks,
   receivedIndices,

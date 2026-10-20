@@ -10,12 +10,14 @@ import {
   UploadStatus,
 } from "@/types/local-uploads/adminApi";
 
+/** Query params for listing uploads; `status` is an optional filter. */
 type ListLocalUploadsParams = {
   status?: UploadStatus;
   take: number;
   skip: number;
 };
 
+/** Fetches a page of local uploads. */
 export const listLocalUploads = async (
   params: ListLocalUploadsParams,
 ): Promise<PaginatedResult<LocalUploadListItem>> => {
@@ -27,6 +29,7 @@ export const listLocalUploads = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Fetches a single local upload by id. */
 export const getLocalUpload = async (uploadId: string): Promise<LocalUploadListItem> => {
   const response = await api.get<ApiEnvelope<LocalUploadListItem>>(
     `${UPLOADS_ENDPOINT}/${uploadId}`,
@@ -35,12 +38,17 @@ export const getLocalUpload = async (uploadId: string): Promise<LocalUploadListI
   return unwrapEnvelope(response.data);
 };
 
+/** Reads the filename from a Content-Disposition header, or null if absent. */
 const extractFileName = (contentDisposition: string | undefined) => {
   if (!contentDisposition) return null;
   const match = contentDisposition.match(/filename="?([^"]+)"?/);
   return match ? match[1] : null;
 };
 
+/**
+ * Extracts the server message from an error response that was requested as a Blob
+ * (the JSON body arrives as a Blob when responseType is "blob").
+ */
 const parseBlobErrorMessage = async (
   data: unknown,
   fallback: string,
@@ -55,6 +63,10 @@ const parseBlobErrorMessage = async (
   }
 };
 
+/**
+ * Downloads a completed upload by triggering a browser save via a temporary object URL.
+ * Throws an Error with a user-friendly message on failure.
+ */
 export const downloadLocalUpload = async (
   uploadId: string,
   fallbackFileName: string,
@@ -96,6 +108,7 @@ export const downloadLocalUpload = async (
   }
 };
 
+/** Permanently deletes an upload and its stored file. */
 export const deleteLocalUploadPermanent = async (
   uploadId: string,
 ): Promise<{ uploadId: string; message: string }> => {
@@ -106,6 +119,7 @@ export const deleteLocalUploadPermanent = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Lists received and missing chunks for an upload. */
 export const listChunks = async (
   uploadId: string,
 ): Promise<ChunksInspection> => {
@@ -116,6 +130,7 @@ export const listChunks = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Fetches the stored checksum of one chunk. */
 export const getChunk = async (
   uploadId: string,
   chunkIndex: number,
@@ -127,6 +142,7 @@ export const getChunk = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Deletes a single stored chunk. */
 export const deleteChunk = async (
   uploadId: string,
   chunkIndex: number,
@@ -138,6 +154,7 @@ export const deleteChunk = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Deletes all stored chunks of an upload. */
 export const deleteAllChunks = async (
   uploadId: string,
 ): Promise<{ uploadId: string; deleted: boolean }> => {

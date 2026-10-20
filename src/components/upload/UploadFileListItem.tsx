@@ -25,6 +25,7 @@ type PropsType = {
   onStartFresh?: (id: string) => void;
 };
 
+/** Card for one queued upload showing details, progress and action buttons driven by item.status. Renders a resume-or-start-fresh prompt when item.resumableUploadId is set. */
 const UploadFileListItem = ({
   item,
   onCancel,

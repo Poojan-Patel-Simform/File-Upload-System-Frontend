@@ -8,6 +8,7 @@ type PropsType = {
   className?: string;
 };
 
+/** Terminal-style log panel for the given log lines; auto-scrolls to the newest entry and renders nothing when empty. */
 const UploadLogs = ({ logs, className }: PropsType) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 

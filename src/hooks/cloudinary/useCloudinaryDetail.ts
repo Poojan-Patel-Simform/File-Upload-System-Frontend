@@ -10,6 +10,7 @@ import {
 } from "@/api/cloudinary/cloudinaryAdminApi";
 import { CloudinaryAssetItem } from "@/types/cloudinary/adminApi";
 
+/** Maps delete failures (HTTP status) to a user-friendly message. */
 const cloudinaryDeleteErrorMessage = (err: unknown): string => {
   if (axios.isAxiosError(err)) {
     const status = err.response?.status;
@@ -20,6 +21,7 @@ const cloudinaryDeleteErrorMessage = (err: unknown): string => {
   return err instanceof Error ? err.message : "Delete failed";
 };
 
+/** Loads one Cloudinary asset and exposes delete for the detail page. */
 const useCloudinaryDetail = (assetId: string) => {
   const router = useRouter();
 

@@ -16,6 +16,7 @@ type CloudinaryDetailViewProps = {
   onCancelDelete: () => void;
 };
 
+/** Presentational detail page for one Cloudinary asset with a delete action; shows loading and not-found states. */
 const CloudinaryDetailView = ({
   asset,
   isLoading,

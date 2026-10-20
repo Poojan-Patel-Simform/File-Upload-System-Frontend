@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import useCloudinaryDetail from "@/hooks/cloudinary/useCloudinaryDetail";
 import CloudinaryDetailView from "@/components/cloudinary/CloudinaryDetailView";
 
+/** Route "/cloudinary/[id]": detail view for one Cloudinary asset. */
 const CloudinaryDetailPage = () => {
   const params = useParams<{ id: string }>();
   const assetId = params.id;

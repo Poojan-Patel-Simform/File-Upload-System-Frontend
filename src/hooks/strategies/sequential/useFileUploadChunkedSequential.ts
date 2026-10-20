@@ -5,6 +5,7 @@ import { DEFAULT_RETRIES } from "@/constants";
 import useFileUploadChunkedBase from "@/hooks/upload/useFileUploadChunkedBase";
 import { UploadChunk } from "@/types/upload/upload";
 
+/** Strategy: uploads chunks one at a time, in order. */
 const sendChunksSequentially: UploadChunk = async ({
   session,
   uploadId,
@@ -17,6 +18,7 @@ const sendChunksSequentially: UploadChunk = async ({
   for (let index = 0; index < chunks.length; index++) {
     if (controller.signal.aborted) return { status: "cancelled" };
 
+    // Pause is checked between chunks; keep the rest so resume continues here.
     if (session.isPaused) {
       session.remainingChunks = chunks.slice(index);
       return { status: "paused" };
@@ -48,6 +50,7 @@ const sendChunksSequentially: UploadChunk = async ({
   return { status: "completed" };
 };
 
+/** Chunked upload hook using the sequential strategy. */
 const useFileUploadChunkedSequential = () =>
   useFileUploadChunkedBase({
     strategy: "sequential",

@@ -22,6 +22,7 @@ type CloudinaryListViewProps = {
   onCancelDelete: () => void;
 };
 
+/** Presentational table of Cloudinary assets with pagination and delete confirmation; take/skip/total drive paging. */
 const CloudinaryListView = ({
   items,
   total,

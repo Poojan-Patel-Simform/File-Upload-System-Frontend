@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import useCloudinaryList from "@/hooks/cloudinary/useCloudinaryList";
 import { deleteCloudinaryAsset } from "@/api/cloudinary/cloudinaryAdminApi";
 
+/** Maps delete failures (HTTP status) to a user-friendly message. */
 const cloudinaryDeleteErrorMessage = (err: unknown): string => {
   if (axios.isAxiosError(err)) {
     const status = err.response?.status;
@@ -17,6 +18,7 @@ const cloudinaryDeleteErrorMessage = (err: unknown): string => {
   return err instanceof Error ? err.message : "Delete failed";
 };
 
+/** Page-level delete-confirm and navigation actions on top of useCloudinaryList. */
 const useCloudinaryListPage = () => {
   const router = useRouter();
   const { take, skip, setSkip, items, total, isLoading, error, refetch } =

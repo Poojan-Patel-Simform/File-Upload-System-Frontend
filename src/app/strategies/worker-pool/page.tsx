@@ -3,6 +3,7 @@
 import UploadPageLayout from "@/components/upload/UploadPageLayout";
 import useFileUploadChunkedWorkerPool from "@/hooks/strategies/worker-pool/useFileUploadChunkedWorkerPool";
 
+/** Route "/strategies/worker-pool": chunked upload sending chunks in parallel via a worker pool. */
 const Home = () => {
   const {
     files,

@@ -3,6 +3,7 @@
 import useChunkInspector from "@/hooks/local-uploads/useChunkInspector";
 import ChunkInspectorView from "@/components/chunk/ChunkInspectorView";
 
+/** Container that loads chunk state for uploadId via useChunkInspector and renders the view; hidden while loading, on error, or for single-chunk uploads. */
 const ChunkInspector = ({ uploadId }: { uploadId: string }) => {
   const {
     chunks,

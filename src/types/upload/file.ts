@@ -1,3 +1,4 @@
+/** Coarse file category used to pick an icon. */
 export type FileType =
   | "image"
   | "video"
@@ -10,6 +11,7 @@ export type FileType =
   | "text"
   | "unknown";
 
+/** A slice of a file; `start` inclusive, `end` exclusive (byte offsets). */
 export type FileChunk = {
   index: number;
   start: number;
@@ -18,6 +20,7 @@ export type FileChunk = {
   chunk: Blob;
 };
 
+/** Server upload statuses (string enum mirror of the backend values). */
 export enum UploadStatus {
   NEW = "NEW",
   UPLOADING = "UPLOADING",
@@ -26,6 +29,7 @@ export enum UploadStatus {
   FAILED = "FAILED",
 }
 
+/** Response of the init endpoint; `uploadedChunks` lists chunks to skip on resume. */
 export type InitUploadResponse = {
   success: boolean;
   data: {
@@ -36,6 +40,7 @@ export type InitUploadResponse = {
   };
 };
 
+/** Response of a chunk upload. */
 export type ChunkUploadResponse = {
   success: boolean;
   data: {
@@ -48,6 +53,7 @@ export type ChunkUploadResponse = {
   };
 };
 
+/** Client-side upload state of a single file in the UI. */
 export enum FileUploadingStatusEnum {
   IDLE,
   UPLOADING,
@@ -57,6 +63,7 @@ export enum FileUploadingStatusEnum {
   ERROR,
 }
 
+/** A file in the upload queue with its UI state. */
 export type UploadFileItem = {
   id: string;
   file: File;

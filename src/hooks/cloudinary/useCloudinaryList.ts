@@ -4,8 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { listCloudinaryAssets } from "@/api/cloudinary/cloudinaryAdminApi";
 import { CloudinaryAssetItem } from "@/types/cloudinary/adminApi";
 
+/** Page size. */
 const TAKE = 20;
 
+/** Fetches the paginated list of saved Cloudinary assets. */
 const useCloudinaryList = () => {
   const [skip, setSkip] = useState(0);
   const [items, setItems] = useState<CloudinaryAssetItem[]>([]);

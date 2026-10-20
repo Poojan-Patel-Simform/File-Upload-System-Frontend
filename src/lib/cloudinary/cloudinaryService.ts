@@ -15,6 +15,7 @@ import { runWorkerPool } from "@/lib/upload/workerPool";
 import { uploadChunkToCloudinary } from "@/api/cloudinary/cloudinaryApi";
 import { CloudinarySessionExpiredError } from "./cloudinaryErrors";
 
+/** Builds a fresh upload session (ids, chunk size, empty progress) for a file. */
 export const createSession = (file: File): CloudinarySession => {
   const uploadSessionId = crypto.randomUUID();
   const chunkSize = Math.max(
@@ -38,6 +39,10 @@ export const createSession = (file: File): CloudinarySession => {
   };
 };
 
+/**
+ * Uploads the given chunks through the worker pool.
+ * An expired session is reported via `expired`, not `error`, so the caller can restart it.
+ */
 const runChunkWorkerPool = async (
   chunks: FileChunk[],
   concurrency: number,
@@ -98,6 +103,7 @@ export const runCloudinaryChunkedUpload = async ({
     onRetryLog,
   };
 
+  // Phases: chunk 0, middle chunks, last chunk (skipped if single-chunk file).
   const lastIndex = totalChunks - 1;
   const phases = [
     { chunks: pending.filter((c) => c.index === 0), concurrency: 1 },
@@ -121,6 +127,7 @@ export const runCloudinaryChunkedUpload = async ({
       context,
     );
 
+    // Expired is checked before error so a dead session restarts instead of failing.
     if (expired) return { status: "expired" };
     if (error) return { status: "error", error };
     if (controller.signal.aborted) return { status: "paused" };

@@ -7,6 +7,7 @@ import ConfirmDialog from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { LocalUploadListItem, UploadStatus } from "@/types/local-uploads/adminApi";
 
+// Filter dropdown values; the empty string means "all statuses".
 const STATUS_OPTIONS: (UploadStatus | "")[] = [
   "",
   "NEW",
@@ -36,6 +37,7 @@ type LocalUploadsListViewProps = {
   onCancelDelete: () => void;
 };
 
+/** Presentational table of local uploads with status filter, pagination, download and delete confirmation; take/skip/total drive paging. */
 const LocalUploadsListView = ({
   status,
   items,

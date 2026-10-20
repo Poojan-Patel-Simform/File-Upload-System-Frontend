@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { STRATEGY_LIST } from "@/constants";
 
+/** Tab links between upload strategies, highlighting the one matching the current path. */
 const StrategyTab = () => {
   const pathName = usePathname();
 

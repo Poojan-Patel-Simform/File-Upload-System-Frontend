@@ -10,6 +10,7 @@ import {
 } from "@/api/local-uploads/localUploadsAdminApi";
 import { LocalUploadListItem } from "@/types/local-uploads/adminApi";
 
+/** Loads one local upload and exposes download/delete actions for the detail page. */
 const useLocalUploadDetail = (uploadId: string) => {
   const router = useRouter();
 

@@ -3,6 +3,7 @@
 import UploadPageLayout from "@/components/upload/UploadPageLayout";
 import useCloudinaryWorkerPoolUpload from "@/hooks/strategies/cloudinary/useCloudinaryWorkerPoolUpload";
 
+/** Route "/strategies/cloudinary": chunked worker-pool upload to Cloudinary. */
 const Home = () => {
   const {
     files,

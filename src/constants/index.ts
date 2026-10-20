@@ -21,11 +21,11 @@ import {
   Send,
 } from "lucide-react";
 
-// Dropzone
+// Dropzone limits (max file size in bytes, max files per drop)
 export const DEFAULT_MAX_SIZE = 20 * 1024 * 1024 * 1024;
 export const DEFAULT_MAX_FILES = 20;
 
-// File details
+// File details: icon per file category
 export const FILE_TYPE_ICON: Record<FileType, typeof File> = {
   image: FileImage,
   video: FileVideo,
@@ -78,7 +78,7 @@ export const STATUS_META: Record<
   },
 };
 
-// Upload admin status
+// Upload admin status: same label/icon/color table keyed by server status
 export const UPLOAD_STATUS_META: Record<
   UploadStatus,
   { label: string; icon: typeof Loader2; className: string }
@@ -110,22 +110,22 @@ export const UPLOAD_STATUS_META: Record<
   },
 };
 
-// Retry
+// Retry: attempt count and exponential-backoff bounds (ms)
 export const DEFAULT_RETRIES = 3;
 export const DEFAULT_BASE_DELAY_MS = 500;
 export const DEFAULT_MAX_DELAY_MS = 8000;
 
-// Cloudinary
+// Cloudinary (min chunk size is Cloudinary's 5MB+ requirement for non-final chunks)
 export const CLOUDINARY_MIN_CHUNK_SIZE = 6 * 1024 * 1024;
 export const CLOUDINARY_WORKER_POOL_CONCURRENCY = 4;
 export const CLOUDINARY_SIGN_ENDPOINT = "/cloudinary/sign";
 export const CLOUDINARY_SAVE_ENDPOINT = "/cloudinary/save";
 export const CLOUDINARY_ENDPOINT = "/cloudinary";
 
-// Uploads admin
+// Uploads admin: backend route
 export const UPLOADS_ENDPOINT = "/uploads";
 
-// Strategy tab
+// Strategy tab: upload strategies shown in the tab bar
 export const STRATEGY_LIST = [
   {
     title: "Traditional",
@@ -149,7 +149,7 @@ export const STRATEGY_LIST = [
   },
 ];
 
-// Admin nav
+// Admin nav: links to the admin pages
 export const ADMIN_NAV_LIST = [
   {
     title: "Local Uploads",
@@ -163,14 +163,13 @@ export const ADMIN_NAV_LIST = [
   },
 ];
 
-// Network
+// Network: fallback upload concurrency
 export const DEFAULT_CONCURRENCY = 5;
 
-// Local Storage
+// Local Storage: key prefix for resume data
 export const STORAGE_KEY_PREFIX = "upload-resume:";
 
-// Index DB
-
+// Index DB: database/store names and schema version
 export const DB_NAME = "cloudinary-uploads";
 export const STORE_NAME = "cloudinary-uploads";
 export const DB_VERSION = 1;

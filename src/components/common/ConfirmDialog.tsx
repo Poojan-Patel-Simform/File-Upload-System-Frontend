@@ -19,6 +19,7 @@ type ConfirmDialogProps = {
   onCancel: () => void;
 };
 
+/** Delete-confirmation modal for resourceLabel, explaining consequence; disables actions and blocks dismissal while onConfirm is pending. */
 const ConfirmDialog = ({
   isOpen,
   resourceLabel,

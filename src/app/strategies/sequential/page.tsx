@@ -3,6 +3,7 @@
 import UploadPageLayout from "@/components/upload/UploadPageLayout";
 import useFileUploadChunkedSequential from "@/hooks/strategies/sequential/useFileUploadChunkedSequential";
 
+/** Route "/strategies/sequential": chunked upload sending one chunk at a time. */
 const Home = () => {
   const {
     files,

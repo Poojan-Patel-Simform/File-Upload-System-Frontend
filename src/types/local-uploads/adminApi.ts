@@ -1,3 +1,4 @@
+/** Server-side lifecycle status of a local upload. */
 export type UploadStatus =
   | "NEW"
   | "UPLOADING"
@@ -5,6 +6,7 @@ export type UploadStatus =
   | "COMPLETED"
   | "FAILED";
 
+/** A local upload row as returned by the admin API. */
 export type LocalUploadListItem = {
   id: string;
   fileHash: string;
@@ -17,8 +19,10 @@ export type LocalUploadListItem = {
   updatedAt: string;
 };
 
+/** A chunk the server has stored; checksum may be null. */
 export type ReceivedChunk = { chunkIndex: number; checksum: string | null };
 
+/** Per-chunk received/missing breakdown for an upload. */
 export type ChunksInspection = {
   uploadId: string;
   totalChunks: number;
@@ -26,6 +30,7 @@ export type ChunksInspection = {
   missingChunks: number[];
 };
 
+/** Stored checksum of a single chunk. */
 export type ChunkChecksum = {
   uploadId: string;
   chunkIndex: number;

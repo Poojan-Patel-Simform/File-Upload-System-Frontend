@@ -18,6 +18,9 @@ import { FileChunk } from "@/types/upload/file";
 import { withRetry } from "@/lib/upload/retryService";
 import { CloudinarySessionExpiredError } from "@/lib/cloudinary/cloudinaryErrors";
 
+/**
+ * Asks the backend for a signed upload payload, or a duplicate hit if this hash already exists.
+ */
 export const signCloudinaryUpload = async (
   publicId: string,
   fileHash: string,
@@ -30,6 +33,7 @@ export const signCloudinaryUpload = async (
   return unwrapEnvelope(response.data);
 };
 
+/** Persists the finished Cloudinary upload (publicId, hash, url) on the backend. */
 export const saveCloudinaryAsset = async (
   payload: CloudinarySaveRequest,
 ): Promise<void> => {
@@ -41,6 +45,10 @@ export const saveCloudinaryAsset = async (
   unwrapEnvelope(response.data);
 };
 
+/**
+ * Uploads one chunk directly to Cloudinary using a signed, resumable session, with retries.
+ * Throws CloudinarySessionExpiredError (non-retryable) if the session is gone.
+ */
 export const uploadChunkToCloudinary = async (
   chunk: FileChunk,
   totalFileSize: number,
@@ -65,6 +73,7 @@ export const uploadChunkToCloudinary = async (
           {
             headers: {
               "X-Unique-Upload-Id": uploadSessionId,
+              // Cloudinary reassembles chunks from the byte range (end is exclusive here).
               "Content-Range": `bytes ${chunk.start}-${chunk.end - 1}/${totalFileSize}`,
             },
             signal,
@@ -74,6 +83,7 @@ export const uploadChunkToCloudinary = async (
         return response.data;
       } catch (err) {
         const status = axios.isAxiosError(err) ? err.response?.status : null;
+        // 404/410 means Cloudinary dropped the session; surface as non-retryable.
         if (status === 404 || status === 410) {
           throw new CloudinarySessionExpiredError();
         }

@@ -1,5 +1,6 @@
 import { FileChunk } from "@/types/upload/file";
 
+/** Signed params needed to upload directly to Cloudinary. */
 export type CloudinarySignedData = {
   duplicate: false;
   cloudName: string;
@@ -9,26 +10,31 @@ export type CloudinarySignedData = {
   publicId: string;
 };
 
+/** Returned instead of signed data when the file already exists, so no upload is needed. */
 export type CloudinaryDuplicateResult = {
   duplicate: true;
   publicId: string;
   url: string;
 };
 
+/** Sign response: discriminate on `duplicate`. */
 export type CloudinarySignResult =
   | CloudinarySignedData
   | CloudinaryDuplicateResult;
 
+/** Raw envelope for the sign endpoint. */
 export type CloudinarySignApiResponse =
   | { success: true; data: CloudinarySignResult }
   | { success: false; message: string; error: string };
 
+/** Payload to record a finished upload. */
 export type CloudinarySaveRequest = {
   publicId: string;
   fileHash: string;
   url: string;
 };
 
+/** Raw envelope for the save endpoint. */
 export type CloudinarySaveApiResponse =
   | { success: true; data: unknown }
   | { success: false; message: string; error: string };
@@ -43,6 +49,7 @@ export type CloudinaryChunkUploadResult = {
   etag?: string;
 };
 
+/** In-memory state of one Cloudinary upload (progress, abort controller, signature). */
 export type CloudinarySession = {
   file: File;
   fileKey: string;
@@ -57,6 +64,7 @@ export type CloudinarySession = {
   resultUrl?: string;
 };
 
+/** Inputs for runCloudinaryChunkedUpload. */
 export type ChunkedUploadParams = {
   file: File;
   chunkSize: number;
@@ -70,12 +78,14 @@ export type ChunkedUploadParams = {
   onRetryLog?: (chunk: FileChunk, attempt: number, delayMs: number) => void;
 };
 
+/** Outcome of a chunked run; `expired` means the session must be restarted. */
 export type ChunkedUploadResult =
   | { status: "completed" }
   | { status: "paused" }
   | { status: "expired" }
   | { status: "error"; error: Error };
 
+/** Shared state passed to each chunk upload in the worker pool. */
 export type ChunkUploadContext = {
   file: File;
   sign: CloudinarySignedData;
@@ -86,6 +96,7 @@ export type ChunkUploadContext = {
   onRetryLog?: (chunk: FileChunk, attempt: number, delayMs: number) => void;
 };
 
+/** Serializable session snapshot persisted (IndexedDB) so an upload can resume. */
 export type CloudinaryUploadRecord = {
   fileKey: string;
   fileHash: string;

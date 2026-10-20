@@ -27,14 +27,17 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     signal?.addEventListener("abort", onAbort, { once: true });
   });
 
+/** True if the error is a fetch/AbortController cancellation. */
 export const isAbortError = (error: unknown): boolean =>
   error instanceof DOMException && error.name === "AbortError";
 
+/** True if the error is flagged `nonRetryable` by the API layer. */
 const isNonRetryable = (error: unknown): boolean =>
   typeof error === "object" &&
   error !== null &&
   (error as { nonRetryable?: boolean }).nonRetryable === true;
 
+/** Runs `fn`, retrying failures with exponential backoff + jitter; abort and non-retryable errors rethrow immediately. */
 export const withRetry = async <T>(
   fn: () => Promise<T>,
   {

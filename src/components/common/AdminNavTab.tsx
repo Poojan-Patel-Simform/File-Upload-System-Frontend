@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ADMIN_NAV_LIST } from "@/constants";
 
+/** Tab links between the admin pages (local uploads / Cloudinary), highlighting the one matching the current path. */
 const AdminNavTab = () => {
   const pathName = usePathname();
 

@@ -8,6 +8,7 @@ import {
   InitUploadResponse,
 } from "@/types/upload/file";
 
+/** Metadata sent to start (or resume) a chunked upload. */
 type InitUploadPayload = {
   fileHash: string;
   fileName: string;
@@ -15,6 +16,7 @@ type InitUploadPayload = {
   totalChunks: number;
 };
 
+/** Starts a chunked upload; the response tells which chunks the server already has. */
 export const initUpload = async (
   payload: InitUploadPayload,
 ): Promise<InitUploadResponse> => {
@@ -22,12 +24,15 @@ export const initUpload = async (
   return response.data;
 };
 
+/** Cancels an in-progress chunked upload on the server. */
 export const abortUpload = async (uploadId: string): Promise<void> => {
   await api.delete(`${UPLOADS_ENDPOINT}/${uploadId}`);
 };
 
+/** Response of the traditional single-request upload. */
 type SingleUploadResponse = { success: boolean };
 
+/** Uploads the whole file in one request, reporting progress as a 0-100 percent. */
 export const uploadSingleFile = async (
   file: File,
   signal: AbortSignal,
@@ -56,12 +61,16 @@ export const uploadSingleFile = async (
   return response.data;
 };
 
+/**
+ * Uploads one chunk with its SHA-256 checksum (server verifies integrity), retrying on failure.
+ */
 export const uploadChunk = async (
   chunk: FileChunk,
   uploadId: string,
   signal: AbortSignal,
   onRetry: (attempt: number, delayMs: number) => void,
 ): Promise<void> => {
+  // Hashed once outside withRetry so retries reuse it.
   const checksum = await sha256Hex(chunk.chunk);
 
   await withRetry(

@@ -3,6 +3,12 @@
 import { UploadFileItem } from "@/types/upload/file";
 import { useState } from "react";
 
+/**
+ * Holds the upload list state shared by all upload hooks.
+ *
+ * @returns updateFile - shallow-merge a patch into one item
+ * @returns appendLog - add a log line to one item
+ */
 const useUploadFilesState = () => {
   const [files, setFiles] = useState<UploadFileItem[]>([]);
 

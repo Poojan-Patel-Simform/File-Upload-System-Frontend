@@ -1,5 +1,6 @@
 import { FileChunk } from "@/types/upload/file";
 
+/** Picks a chunk size by file size tier: bigger files get bigger chunks to cap the chunk count. */
 export const getChunkSize = (fileSize: number): number => {
   const MB = 1024 * 1024;
   const GB = 1024 * MB;
@@ -23,6 +24,7 @@ export const getChunkSize = (fileSize: number): number => {
   return 50 * MB;
 };
 
+/** Splits a File into contiguous Blob slices; `end` is exclusive and the last chunk may be smaller. */
 export const generateFileChunks = (
   file: File,
   customChunkSize?: number,
